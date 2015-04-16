@@ -1,0 +1,14 @@
+Django
+MySQL-python
+Pillow
+celery
+gnureadline
+html5lib
+ipython
+pytz
+requests
+six
+wagtail
+
+# apps customs
+git+https://github.com/ninjaotoko/django-metrics.git
