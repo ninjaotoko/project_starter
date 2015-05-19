@@ -1,10 +1,7 @@
 Django
-wagtail
 MySQL-python
 Pillow
 celery
-#gnureadline
-html5lib
 ipython
 pytz
 requests
@@ -12,6 +9,6 @@ six
 fabric
 
 # apps customs
-git+https://github.com/ninjaotoko/django-metrics.git
-git+https://github.com/ninjaotoko/django-tagembed.git
-git+https://github.com/Mars0n/django-menuresolver.git
+https://github.com/ninjaotoko/django-metrics.git
+https://github.com/ninjaotoko/django-tagembed.git
+https://github.com/Mars0n/django-menuresolver.git
