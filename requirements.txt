@@ -9,6 +9,10 @@ six
 fabric
 
 # apps customs
-https://github.com/ninjaotoko/django-metrics.git
-https://github.com/ninjaotoko/django-tagembed.git
-https://github.com/Mars0n/django-menuresolver.git
+git+https://github.com/ninjaotoko/djblog.git
+git+https://github.com/ninjaotoko/dynaform.git
+git+https://github.com/ninjaotoko/django-skeleton.git
+git+https://github.com/ninjaotoko/django-mediacontent.git
+git+https://github.com/ninjaotoko/django-metrics.git
+git+https://github.com/ninjaotoko/django-tagembed.git
+git+https://github.com/ninjaotoko/django-menuresolver.git

@@ -110,12 +110,12 @@ then
         read -r -p "Escribir nombre de DB para el proyecto (ej: $project_name""_db): " database_name
     fi
 
-    read -r -p "Usar 'dev'@'%' para permisos de DB [y/N]: " ifreq
+    read -r -p "Usar 'dev'@'localhost' para permisos de DB [y/N]: " ifreq
     if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
     then
-        user_permission="'dev'@'%'"
+        user_permission="'dev'@'localhost'"
     else
-        read -r -p "Escribir 'usuario' y 'host' con comillas para permisos de DB (ej 'dev'@'%'): " user_permission
+        read -r -p "Escribir 'usuario' y 'host' con comillas para permisos de DB (ej 'dev'@'localhost'): " user_permission
     fi
     
     echo "CREATE DATABASE $database_name; GRANT ALL ON $database_name.* TO $user_permission;" | sudo mysql
@@ -127,8 +127,32 @@ read -r -p "Crear local.py para proyecto Django [y/N]: " ifreq
 
 if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
 then
-    wget --no-check-certificate -O local.py https://raw.githubusercontent.com/ninjaotoko/project_starter/master/local.py 
-    sed -e "s/\${database_name}/"$database_name"/" local.py
+    if [[ !$database_name ]]
+    then
+        read -r -p "Nombre de la base de datos: " database_name
+    fi
+
+    if [[ !$database_user ]]
+    then
+        read -r -p "Nombre de usuario de la base de datos: " database_user
+    fi
+
+    if [[ !$database_pass ]]
+    then
+        read -r -p "Password de la base de datos: " database_pass
+    fi
+
+    if [[ !$database_host ]]
+    then
+        read -r -p "Host para conectar la base de datos (opcional):  " database_host
+    fi
+
+    wget --no-check-certificate -O - https://raw.githubusercontent.com/ninjaotoko/project_starter/master/local.py | \
+        sed -e "s/\${database_name}/"$database_name"/" \
+        -e "s/\${database_user}/"$database_user"/" \
+        -e "s/\${database_pass}/"$database_pass"/" \
+        -e "s/\${database_host}/"$database_host"/" \
+        > local.py
 fi
 
 # Preparar local con fabric
