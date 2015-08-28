@@ -1,5 +1,5 @@
 Django
-MySQL-python
+mysqlclient
 Pillow
 celery
 ipython

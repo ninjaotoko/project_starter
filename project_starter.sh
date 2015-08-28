@@ -34,6 +34,7 @@ echo -e "$COL_RESET"
 read -r -p "Nombre del proyecto (se creará un directorio): " project_name
 
 project_path=$(echo $project_name | tr " " "_" | tr A-Z a-z)
+echo -e "Crendo directorio ./$project_path"
 mkdir $project_path
 cd $project_path
 
@@ -57,8 +58,27 @@ then
 fi
 
 
+# Cargar template de proyecto
+echo -e "$COL_GREEN"
+echo -e "Crea la estructura del proyecto desde el template https://bitbucket.org/devlinkb/matriz $COL_RESET"
+git clone https://bitbucket.org/devlinkb/matriz tmp
+
+# Crea el enviroment para virtualenv
+echo -e "$COL_GREEN"
+echo -e "Crea el enviroment $COL_RESET"
+pip install -r tmp/requirements.txt
+
+echo -e "$COL_YELLOW"
+echo -e "pip instaló$COL_RESET"
+pip freeze
+
+echo -e "Limpiando ... .git y otros temporales"
+rm -rf tmp/.git
+mv tmp/* .
+rm -rf tmp
+
 # Carga el repo si es necesario
-echo -e "Hay repositorio? pegar URL (de clone): "
+echo -e "Hay repositorio creado para este proyecto? pegar URL (de clone): "
 read -r -e url_repo
 
 if [[ "$url_repo" ]]
@@ -80,20 +100,44 @@ then
             pip install -r repo/requirements.txt
         fi
     fi
+else
+    read -r -p "Iniciar versionado git? [y/N]: " ifreq
+
+    # Crea el repo y hace commit inicial
+    if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
+    then
+        mkdir repo
+        cd repo
+        git init
+        read -r -p "Crear `origin`? git remote add origin (pegar url)" url_origin
+        if [[ $url_origin ]]
+        then
+            git remote add origin $url_origin
+            git add .
+            git commit -m "init proyecto $project_name"
+            git push -u origin master
+        fi
+    fi
+
+    # Crea el proyecto de djagno
+    django-admin.py $project_name
+    mv ../local.py $project_name/
+
 fi
 
-# Instalar paquetes commons
-read -r -p "Instalar common desde github.com/ninjaotoko/project_starter? [y/N]: " ifyesno
 
-if [[ $ifyesno =~ ^([yY][eE][sS]|[yY])$ ]]
-then
-    wget --no-check-certificate -O project_starter_requirements.txt https://raw.githubusercontent.com/ninjaotoko/project_starter/master/requirements.txt
-    pip install -r project_starter_requirements.txt
-fi
-
-echo -e "$COL_YELLOW"
-echo -e "pip instaló$COL_RESET"
-pip freeze
+# # Instalar paquetes commons
+# read -r -p "Instalar common desde github.com/ninjaotoko/project_starter? [y/N]: " ifyesno
+# 
+# if [[ $ifyesno =~ ^([yY][eE][sS]|[yY])$ ]]
+# then
+#     wget --no-check-certificate -O project_starter_requirements.txt https://raw.githubusercontent.com/ninjaotoko/project_starter/master/requirements.txt
+#     pip install -r project_starter_requirements.txt
+# fi
+# 
+# echo -e "$COL_YELLOW"
+# echo -e "pip instaló$COL_RESET"
+# pip freeze
 
 
 # Crear Mysql
@@ -127,6 +171,7 @@ read -r -p "Crear local.py para proyecto Django [y/N]: " ifreq
 
 if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
 then
+
     if [[ !$database_name ]]
     then
         read -r -p "Nombre de la base de datos: " database_name
@@ -147,26 +192,39 @@ then
         read -r -p "Host para conectar la base de datos (opcional):  " database_host
     fi
 
-    wget --no-check-certificate -O - https://raw.githubusercontent.com/ninjaotoko/project_starter/master/local.py | \
-        sed -e "s/\${database_name}/"$database_name"/" \
+    #wget --no-check-certificate -O - https://raw.githubusercontent.com/ninjaotoko/project_starter/master/local.py  \
+    #    sed -e "s/\${database_name}/"$database_name"/" \
+    #    -e "s/\${database_user}/"$database_user"/" \
+    #    -e "s/\${database_pass}/"$database_pass"/" \
+    #    -e "s/\${database_host}/"$database_host"/" \
+    #    > local.py
+
+    cat ../local.py sed -e "s/\${database_name}/"$database_name"/" \
         -e "s/\${database_user}/"$database_user"/" \
         -e "s/\${database_pass}/"$database_pass"/" \
         -e "s/\${database_host}/"$database_host"/" \
-        > local.py
+        > $project_name/local.py
+
 fi
 
-# Preparar local con fabric
-read -r -p "Ejecutar fabric prepare_local? [y/N]: " ifreq
+# # Preparar local con fabric
+# read -r -p "Ejecutar fabric prepare_local? [y/N]: " ifreq
+# 
+# if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
+# then
+# 
+#     if [[ "$url_repo" ]]
+#     then
+#         cd repo
+#         fab prepare_local
+#     fi
+# fi
 
-if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
-then
+# Crea los estaticos
+echo -e "$COL_GREEN"
+echo -e "Crea el proyecto de foundation$COL_RESET"
+foundation new $project_name/assets
 
-    if [[ "$url_repo" ]]
-    then
-        cd repo
-        fab prepare_local
-    fi
-fi
 
 echo -e "Para comenzar ejecuta $COL_MAGENTA source activate.sh$COL_RESET"
 echo -e "$COL_GREEN"

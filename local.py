@@ -1,3 +1,5 @@
+# -*- coding:utf-8 -*-
+from settings import *
 
 DATABASES = {
      'default': {
@@ -9,6 +11,27 @@ DATABASES = {
          'PORT': '',  # Set to empty string for default.
      }
  }
+
+STATICFILES_DIRS = (
+    'assets',
+)
+
+STATIC_URL = '/static/'
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'compiled_statics')
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+SITE_ID = 1
+
+EMAIL_HOST = 'smtp.mandrillapp.com'
+EMAIL_HOST_PASSWORD = '55zSnPrpFHyKeC7Z3SDqYQ'
+EMAIL_HOST_USER = 'xavier@link-b.com'
+EMAIL_PORT = '587'
+
+REDACTOR_OPTIONS = {'lang': 'es', 'plugins': ['extract']}
 
 LOGGING = {
     'version': 1,
