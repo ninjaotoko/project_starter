@@ -101,7 +101,6 @@ then
     echo "urlpatterns += [" >> $absolute_project_path/sites/urls.py
     echo "    url(r'^dynaform/', include('dynaform.urls'))," >> $absolute_project_path/sites/urls.py
     echo "    url(r'^redactor/', include('redactor.urls'))," >> $absolute_project_path/sites/urls.py
-    echo "    url(r'', include('djblog.urls'))," >> $absolute_project_path/sites/urls.py
     echo "]" >> $absolute_project_path/sites/urls.py
     echo "" >> $absolute_project_path/sites/urls.py
 
@@ -115,11 +114,17 @@ then
     echo "    # UI" >> $absolute_project_path/sites/urls.py
     echo "    urlpatterns += [" >> $absolute_project_path/sites/urls.py
     echo "        url(r'^ui/(?P<tempate_name>[\w\-\_]+)\.html/?$', UIFlatView.as_view(), name='ui')," >> $absolute_project_path/sites/urls.py
+    echo "        url(r'', include('djblog.urls'))," >> $absolute_project_path/sites/urls.py
     echo "    ]" >> $absolute_project_path/sites/urls.py
     echo "" >> $absolute_project_path/sites/urls.py
     echo "    # STATICS" >> $absolute_project_path/sites/urls.py
     echo "    urlpatterns += staticfiles_urlpatterns()" >> $absolute_project_path/sites/urls.py
     echo "    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)" >> $absolute_project_path/sites/urls.py
+    echo "" >> $absolute_project_path/sites/urls.py
+    echo "else:" >> $absolute_project_path/sites/urls.py
+    echo "    urlpatterns += [" >> $absolute_project_path/sites/urls.py
+    echo "        url(r'', include('djblog.urls'))," >> $absolute_project_path/sites/urls.py
+    echo "    ]" >> $absolute_project_path/sites/urls.py
 
 fi
 

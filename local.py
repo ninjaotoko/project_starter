@@ -31,7 +31,7 @@ INSTALLED_APPS = (
     'dynaform',
 
     # libs
-    'haystack',
+    #'haystack',
     'redactor',
 )
 
