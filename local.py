@@ -12,6 +12,30 @@ DATABASES = {
      }
  }
 
+INSTALLED_APPS = (
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django.contrib.sites',
+
+    # apps
+    'djblog',
+    'djangoskeleton',
+    'mediacontent',
+    'menuresolver',
+    'djangometrics',
+    'tagembed',
+    'dynaform',
+
+    # libs
+    'haystack',
+    'redactor',
+)
+
+
 STATICFILES_DIRS = (
     'assets',
 )
@@ -32,6 +56,25 @@ EMAIL_HOST_USER = 'xavier@link-b.com'
 EMAIL_PORT = '587'
 
 REDACTOR_OPTIONS = {'lang': 'es', 'plugins': ['extract']}
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'ui'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
 
 LOGGING = {
     'version': 1,

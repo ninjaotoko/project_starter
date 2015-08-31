@@ -34,9 +34,15 @@ echo -e "$COL_RESET"
 read -r -p "Nombre del proyecto (se creará un directorio): " project_name
 
 project_path=$(echo $project_name | tr " " "_" | tr A-Z a-z)
+absolute_project_path=$(echo `pwd`/$project_path)
 echo -e "Crendo directorio ./$project_path"
-mkdir $project_path
-cd $project_path
+mkdir -p $absolute_project_path
+cd $absolute_project_path
+
+echo -e "$COL_YELLOW"
+echo -e "# project_path: $project_path"
+echo -e "# absolute_project_path: $absolute_project_path"
+echo -e "$COL_RESET"
 
 
 # Crea un virtualenv
@@ -48,7 +54,7 @@ then
     virtualenv $target
     touch activate.sh
     echo "#!/bin/bash" >> activate.sh
-    echo "source env_$project_name/bin/activate" >> activate.sh
+    echo "source $target/bin/activate" >> activate.sh
     chmod +x activate.sh
 
     echo -e "$COL_GREEN"
@@ -60,8 +66,10 @@ fi
 
 # Cargar template de proyecto
 echo -e "$COL_GREEN"
-echo -e "Crea la estructura del proyecto desde el template https://bitbucket.org/devlinkb/matriz $COL_RESET"
-git clone https://bitbucket.org/devlinkb/matriz tmp
+echo -e "Crea la estructura del proyecto desde el template https://github.com/ninjaotoko/project_starter $COL_RESET"
+git clone https://github.com/ninjaotoko/project_starter tmp
+
+rm tmp/project_starter.sh
 
 # Crea el enviroment para virtualenv
 echo -e "$COL_GREEN"
@@ -76,6 +84,46 @@ echo -e "Limpiando ... .git y otros temporales"
 rm -rf tmp/.git
 mv tmp/* .
 rm -rf tmp
+
+read -r -p "Correr django-admin ? [y/N]: " ifreq
+if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
+then
+    # Crea el proyecto de djagno
+    django-admin startproject sites $absolute_project_path/
+    #mv local.py $project_name/
+    ls -al
+    let django_start_project=1
+
+    mv $absolute_project_path/views.py $absolute_project_path/sites/
+
+    echo "" >> $absolute_project_path/sites/urls.py
+    echo "# Agregado automaticamente por 'project_starter.sh'" >> $absolute_project_path/sites/urls.py
+    echo "urlpatterns += [" >> $absolute_project_path/sites/urls.py
+    echo "    url(r'^dynaform/', include('dynaform.urls'))," >> $absolute_project_path/sites/urls.py
+    echo "    url(r'^redactor/', include('dynaform'))," >> $absolute_project_path/sites/urls.py
+    echo "    url(r'', include('djblog'))," >> $absolute_project_path/sites/urls.py
+    echo "]" >> $absolute_project_path/sites/urls.py
+    echo "" >> $absolute_project_path/sites/urls.py
+
+    echo "from django.conf import settings" >> $absolute_project_path/sites/urls.py
+    echo "if settings.DEBUG:" >> $absolute_project_path/sites/urls.py
+    echo "    from django.contrib.staticfiles.urls import staticfiles_urlpatterns" >> $absolute_project_path/sites/urls.py
+    echo "    from django.conf.urls.static import static" >> $absolute_project_path/sites/urls.py
+    echo "    from sites.views import UIFlatView" >> $absolute_project_path/sites/urls.py
+
+    echo "" >> $absolute_project_path/sites/urls.py
+    echo "    # UI" >> $absolute_project_path/sites/urls.py
+    echo "    urlpatterns += [" >> $absolute_project_path/sites/urls.py
+    echo "        url(r'^ui/(?P<tempate_name>[\w\-\_]+)\.html/?$', UIFlatView.as_view(), name='ui')," >> $absolute_project_path/sites/urls.py
+    echo "    ]" >> $absolute_project_path/sites/urls.py
+    echo "" >> $absolute_project_path/sites/urls.py
+    echo "    # STATICS" >> $absolute_project_path/sites/urls.py
+    echo "    urlpatterns += staticfiles_urlpatterns()" >> $absolute_project_path/sites/urls.py
+    echo "    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)" >> $absolute_project_path/sites/urls.py
+
+fi
+
+
 
 # Carga el repo si es necesario
 echo -e "Hay repositorio creado para este proyecto? pegar URL (de clone): "
@@ -109,7 +157,7 @@ else
         mkdir repo
         cd repo
         git init
-        read -r -p "Crear `origin`? git remote add origin (pegar url)" url_origin
+        read -r -p "Crear 'origin'? git remote add origin (pegar url)" url_origin
         if [[ $url_origin ]]
         then
             git remote add origin $url_origin
@@ -117,12 +165,14 @@ else
             git commit -m "init proyecto $project_name"
             git push -u origin master
         fi
+
+        cd $absolute_project_path
+        mv sites templates manage.py requirements.txt repo/
+        cd $absolute_project_path/repo
+        git add .
+        git commit -m "update local $project_name"
+        git push -u origin master
     fi
-
-    # Crea el proyecto de djagno
-    django-admin.py $project_name
-    mv ../local.py $project_name/
-
 fi
 
 
@@ -172,22 +222,22 @@ read -r -p "Crear local.py para proyecto Django [y/N]: " ifreq
 if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
 then
 
-    if [[ !$database_name ]]
+    if [ ! $database_name ]
     then
         read -r -p "Nombre de la base de datos: " database_name
     fi
 
-    if [[ !$database_user ]]
+    if [ ! $database_user ]
     then
         read -r -p "Nombre de usuario de la base de datos: " database_user
     fi
 
-    if [[ !$database_pass ]]
+    if [ ! $database_pass ]
     then
         read -r -p "Password de la base de datos: " database_pass
     fi
 
-    if [[ !$database_host ]]
+    if [ ! $database_host ]
     then
         read -r -p "Host para conectar la base de datos (opcional):  " database_host
     fi
@@ -199,12 +249,27 @@ then
     #    -e "s/\${database_host}/"$database_host"/" \
     #    > local.py
 
-    cat ../local.py sed -e "s/\${database_name}/"$database_name"/" \
+    cat $absolute_project_path/local.py | sed -e "s/\${database_name}/"$database_name"/" \
         -e "s/\${database_user}/"$database_user"/" \
         -e "s/\${database_pass}/"$database_pass"/" \
         -e "s/\${database_host}/"$database_host"/" \
-        > $project_name/local.py
+        > $absolute_project_path/repo/sites/local.py
 
+    rm $absolute_project_path/local.py
+
+    touch $absolute_project_path/repo/run.sh
+    echo "python manage.py runserver --settings=sites.local" >> $absolute_project_path/repo/run.sh 
+
+    touch $absolute_project_path/repo/shell.sh
+    echo "python manage.py shell --settings=sites.local" >> $absolute_project_path/repo/shell.sh 
+
+    touch $absolute_project_path/repo/dbshell.sh
+    echo "python manage.py dbshell --settings=sites.local" >> $absolute_project_path/repo/dbshell.sh 
+
+    touch $absolute_project_path/repo/collectstatic.sh
+    echo "python manage.py collectstatic --settings=sites.local" >> $absolute_project_path/repo/collectstatic.sh 
+
+    chmod +x $absolute_project_path/repo/{run.sh,shell.sh,dbshell.sh,collectstatic.sh}
 fi
 
 # # Preparar local con fabric
@@ -223,7 +288,7 @@ fi
 # Crea los estaticos
 echo -e "$COL_GREEN"
 echo -e "Crea el proyecto de foundation$COL_RESET"
-foundation new $project_name/assets
+foundation new $absolute_project_path/repo/assets
 
 
 echo -e "Para comenzar ejecuta $COL_MAGENTA source activate.sh$COL_RESET"
