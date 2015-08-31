@@ -100,8 +100,8 @@ then
     echo "# Agregado automaticamente por 'project_starter.sh'" >> $absolute_project_path/sites/urls.py
     echo "urlpatterns += [" >> $absolute_project_path/sites/urls.py
     echo "    url(r'^dynaform/', include('dynaform.urls'))," >> $absolute_project_path/sites/urls.py
-    echo "    url(r'^redactor/', include('dynaform'))," >> $absolute_project_path/sites/urls.py
-    echo "    url(r'', include('djblog'))," >> $absolute_project_path/sites/urls.py
+    echo "    url(r'^redactor/', include('redactor.urls'))," >> $absolute_project_path/sites/urls.py
+    echo "    url(r'', include('djblog.urls'))," >> $absolute_project_path/sites/urls.py
     echo "]" >> $absolute_project_path/sites/urls.py
     echo "" >> $absolute_project_path/sites/urls.py
 
