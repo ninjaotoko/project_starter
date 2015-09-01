@@ -129,56 +129,55 @@ then
 fi
 
 
+read -r -p "Iniciar versionado git? [y/N]: " ifreq
 
-# Carga el repo si es necesario
-echo -e "Hay repositorio creado para este proyecto? pegar URL (de clone): "
-read -r -e url_repo
-
-if [[ "$url_repo" ]]
+# Crea el repo y hace commit inicial
+if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
 then
-    if [[ "$url_repo" == *.git ]]
+    mkdir repo
+    cd repo
+    git init
+    read -r -p "Crear 'origin'? git remote add origin (pegar url)" url_origin
+    if [[ $url_origin ]]
     then
-        git clone $url_repo repo
-    else
-        hg clone $url_repo repo
-    fi
-
-    if [ ! -f repo/requirements.txt ]
-    then
-        # Instalar requirements.txt si es necesario
-        read -r -p "Instalar repo/requirements.txt del repositorio (si existe)? [y/N]: " ifreq
-
-        if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
-        then
-            pip install -r repo/requirements.txt
-        fi
-    fi
-else
-    read -r -p "Iniciar versionado git? [y/N]: " ifreq
-
-    # Crea el repo y hace commit inicial
-    if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
-    then
-        mkdir repo
-        cd repo
-        git init
-        read -r -p "Crear 'origin'? git remote add origin (pegar url)" url_origin
-        if [[ $url_origin ]]
-        then
-            git remote add origin $url_origin
-            git add .
-            git commit -m "init proyecto $project_name"
-            git push -u origin master
-        fi
-
-        cd $absolute_project_path
-        mv sites templates manage.py requirements.txt repo/
-        cd $absolute_project_path/repo
+        git remote add origin $url_origin
         git add .
-        git commit -m "update local $project_name"
+        git commit -m "init proyecto $project_name"
         git push -u origin master
     fi
+
+    cd $absolute_project_path
+    mv sites templates manage.py requirements.txt repo/
+    cd $absolute_project_path/repo
+    git add .
+    git commit -m "update local $project_name"
+    git push -u origin master
 fi
+
+# Carga el repo si es necesario
+#echo -e "Hay repositorio creado para este proyecto? pegar URL (de clone): "
+#read -r -e url_repo
+#
+#if [[ "$url_repo" ]]
+#then
+#    if [[ "$url_repo" == *.git ]]
+#    then
+#        git clone $url_repo repo
+#    else
+#        hg clone $url_repo repo
+#    fi
+#
+#    if [ ! -f repo/requirements.txt ]
+#    then
+#        # Instalar requirements.txt si es necesario
+#        read -r -p "Instalar repo/requirements.txt del repositorio (si existe)? [y/N]: " ifreq
+#
+#        if [[ $ifreq =~ ^([yY][eE][sS]|[yY])$ ]]
+#        then
+#            pip install -r repo/requirements.txt
+#        fi
+#    fi
+#fi
 
 
 # # Instalar paquetes commons
@@ -294,7 +293,7 @@ fi
 echo -e "$COL_GREEN"
 echo -e "Crea el proyecto de foundation$COL_RESET"
 foundation new $absolute_project_path/repo/assets
-
+compass compile $absolute_project_path/repo/assets
 
 echo -e "Para comenzar ejecuta $COL_MAGENTA source activate.sh$COL_RESET"
 echo -e "$COL_GREEN"
