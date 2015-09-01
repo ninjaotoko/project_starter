@@ -11,5 +11,5 @@ logger = logging.getLogger(__name__)
 class UIFlatView(TemplateView):
     def get_template_names(self):
         return [
-                self.kwargs.get('tempate_name')
+                "%s.html" % self.kwargs.get('tempate_name'),
                 ]

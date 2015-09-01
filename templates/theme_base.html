@@ -28,7 +28,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
 <meta name="description" content="" />
 <title>{% block title %}{% firstof object.title category.name post_type.post_type_name %}{% endblock %} {% block title_suffix %}{{ site.name }}{% endblock %}</title>
-<link rel="stylesheet" type="text/css" href="{% static 'css/app.css' %}" />
+<link rel="stylesheet" type="text/css" href="{% static 'stylesheets/app.css' %}" />
 {% block extra_css %}{% endblock %}
 <script src="{% static 'bower_components/modernizr/modernizr.js' %}"></script>
 
@@ -42,7 +42,6 @@
 
 <script type="text/javascript" src="{% static 'bower_components/jquery/dist/jquery.min.js' %}"></script>
 <script type="text/javascript" src="{% static 'bower_components/foundation/js/foundation.min.js' %}"></script>
-<script type="text/javascript" src="{% static 'js/website.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/app.js' %}"></script>
 <script type="text/javascript" src="{% static 'js/app.ajaxsend-file.js' %}"></script>
 {% block extra_js %}{% endblock %}
