@@ -257,6 +257,7 @@ then
         -e "s/\${database_user}/"$database_user"/" \
         -e "s/\${database_pass}/"$database_pass"/" \
         -e "s/\${database_host}/"$database_host"/" \
+        -e "s/\${index_name}/"$project_name"/" \
         > $absolute_project_path/repo/sites/local.py
 
     rm $absolute_project_path/local.py
